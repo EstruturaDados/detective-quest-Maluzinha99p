@@ -14,10 +14,10 @@ typedef struct No{
     struct No* direita;
 }No;
 
-void menuPrincipal();
+void menuPrincipal(No* raiz);
 struct No* criarSala(const char* nome);
 struct No* conectarSala(struct No* raiz, const char *nome);
-struct No* explorarSalas(No* raiz, char* opcao);
+struct No* explorarSalas(No* raiz, char opcao);
 
 int main() {
 
@@ -32,6 +32,8 @@ int main() {
     // - Use recursão ou laços para caminhar pela árvore.
     // - Nenhuma inserção dinâmica é necessária neste nível.
     No* nome = NULL;
+
+
     char opcao[2];
 
     nome = conectarSala(nome, "Hall de Entrada");
@@ -43,6 +45,8 @@ int main() {
     nome = conectarSala(nome, "Quarto");
     nome = conectarSala(nome, "Biblioteca");
 
+    No* atual = nome;
+
     do{
         menuPrincipal();
         scanf(" %c", &opcao[0]);
@@ -50,10 +54,10 @@ int main() {
         switch(opcao[0])
         {
             case 'e':
-                printf("Comodo: %s\n",explorarSalas(&nome, opcao));
+                atual = explorarSalas(atual, opcao[0]);
             break;
             case 'd':
-                printf("Comodo: %s\n",explorarSalas(&nome, opcao));
+                atual = explorarSalas(atual, opcao[0]);
             break;
             case 's':
                 printf("Saindo do sistema...");
@@ -93,7 +97,7 @@ int main() {
     return 0;
 }
 
-void menuPrincipal()
+void menuPrincipal(No* raiz)
 {
     printf("==================================\n");
     printf(" Escolha a opção que você deseja\n");
@@ -102,7 +106,7 @@ void menuPrincipal()
     printf("D - direita\n");
     printf("S - sair do sistema\n");
     printf("-----------------------------------\n");
-    printf("Ambiente atual: sla\n");
+    printf("Ambiente atual: %s\n", raiz->nome);
     printf("-----------------------------------\n");
     printf("Opção: ");
 }
@@ -146,7 +150,7 @@ struct No* conectarSala(struct No* raiz, const char *nome)
     return raiz;
 }
 
-struct No* explorarSalas(No* raiz, char* opcao)
+struct No* explorarSalas(No* raiz, char opcao)
 {
     if(raiz == NULL)
     {
@@ -154,14 +158,19 @@ struct No* explorarSalas(No* raiz, char* opcao)
         return NULL;
     }
 
+    printf("Comodo atual: %s\n", raiz->nome);
+
     if(opcao == 'e')
     {
-        return raiz->nome;
-        explorarSalas(raiz->esquerda, opcao);
+        return raiz->esquerda;
     }
-    else
+    else if(opcao == 'd')
     {
-        return raiz->nome;
-        explorarSalas(raiz->direita, opcao);
+        return raiz->direita;
     }
+    else{
+        printf("Não há salas nesse sentido!\n");
+    }
+
+    return raiz;
 }
