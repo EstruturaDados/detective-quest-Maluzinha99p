@@ -1,9 +1,23 @@
 #include <stdio.h>
-
+#include <string.h>
+#include <stdlib.h>
+#include <locale.h>
 // Desafio Detective Quest
 // Tema 4 - Árvores e Tabela Hash
 // Este código inicial serve como base para o desenvolvimento das estruturas de navegação, pistas e suspeitos.
 // Use as instruções de cada região para desenvolver o sistema completo com árvore binária, árvore de busca e tabela hash.
+#define MAX_S 50
+
+typedef struct No{
+    char nome[MAX_S];
+    struct No* esquerda;
+    struct No* direita;
+}No;
+
+void menuPrincipal();
+struct No* criarSala(const char* nome);
+struct No* conectarSala(struct No* raiz, const char *nome);
+struct No* explorarSalas(No* raiz, char* opcao);
 
 int main() {
 
@@ -17,6 +31,40 @@ int main() {
     // - Exiba o nome da sala a cada movimento.
     // - Use recursão ou laços para caminhar pela árvore.
     // - Nenhuma inserção dinâmica é necessária neste nível.
+    No* nome = NULL;
+    char opcao[2];
+
+    nome = conectarSala(nome, "Hall de Entrada");
+    nome = conectarSala(nome, "Cozinha");
+    nome = conectarSala(nome, "Sala de estar");
+    nome = conectarSala(nome, "Varanda");
+    nome = conectarSala(nome, "Quarto");
+    nome = conectarSala(nome, "Banheiro");
+    nome = conectarSala(nome, "Quarto");
+    nome = conectarSala(nome, "Biblioteca");
+
+    do{
+        menuPrincipal();
+        scanf(" %c", &opcao[0]);
+
+        switch(opcao[0])
+        {
+            case 'e':
+                printf("Comodo: %s\n",explorarSalas(&nome, opcao));
+            break;
+            case 'd':
+                printf("Comodo: %s\n",explorarSalas(&nome, opcao));
+            break;
+            case 's':
+                printf("Saindo do sistema...");
+            break;
+            default:
+                printf("Opção inválida, por favor escolha a correta!\n\n");
+            break;
+        }
+        sleep(1);
+    }while(opcao[0] != 's');
+    
 
     // 🔍 Nível Aventureiro: Armazenamento de Pistas com Árvore de Busca
     //
@@ -45,3 +93,75 @@ int main() {
     return 0;
 }
 
+void menuPrincipal()
+{
+    printf("==================================\n");
+    printf(" Escolha a opção que você deseja\n");
+    printf("==================================\n");
+    printf("E - esquerda\n");
+    printf("D - direita\n");
+    printf("S - sair do sistema\n");
+    printf("-----------------------------------\n");
+    printf("Ambiente atual: sla\n");
+    printf("-----------------------------------\n");
+    printf("Opção: ");
+}
+
+//FUNÇÃO DE CRIAR NÓ
+struct No* criarSala(const char* nome)
+{
+    struct No* novo = (struct No*) malloc(sizeof(struct No));
+
+    if(novo == NULL)
+    {
+        sleep(1);
+        printf("Erro ao alocar memória!");
+        return NULL;
+    }
+
+    strcpy(novo->nome, nome);
+
+    novo->esquerda = NULL;
+    novo->direita = NULL;
+
+    return novo;
+}
+
+//função para adicionar
+struct No* conectarSala(struct No* raiz, const char *nome)
+{
+    if(raiz == NULL)
+    {
+        return criarSala(nome);
+    }
+    
+    if(strcmp(nome, raiz->nome) < 0)
+    {
+        raiz->esquerda = conectarSala(raiz->esquerda, nome);
+    }
+    else{
+        raiz->direita = conectarSala(raiz->direita, nome);
+    }
+
+    return raiz;
+}
+
+struct No* explorarSalas(No* raiz, char* opcao)
+{
+    if(raiz == NULL)
+    {
+        printf("Comodo sem saída!\n");
+        return NULL;
+    }
+
+    if(opcao == 'e')
+    {
+        return raiz->nome;
+        explorarSalas(raiz->esquerda, opcao);
+    }
+    else
+    {
+        return raiz->nome;
+        explorarSalas(raiz->direita, opcao);
+    }
+}
