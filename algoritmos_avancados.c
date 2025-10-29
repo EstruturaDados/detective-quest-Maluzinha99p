@@ -14,6 +14,12 @@ typedef struct No{
     struct No* direita;
 }No;
 
+typedef struct Pista{
+    char nomeP[MAX_S];
+    struct Pista* esquerda;
+    struct Pista* direita;
+}Pista;
+
 struct No* menuPrincipal(No* raiz);
 struct No* criarSala(const char* nome);
 struct No* conectarSala(struct No* raiz, const char *nome);
@@ -112,6 +118,7 @@ struct No* menuPrincipal(No* raiz)
     printf("Opção: ");
 }
 
+////////////////////////////// FUNÇÕES DA ÁRVORE DOS COMODOS //////////////////////////////////
 //FUNÇÃO DE CRIAR NÓ
 struct No* criarSala(const char* nome)
 {
@@ -125,7 +132,6 @@ struct No* criarSala(const char* nome)
     }
 
     strcpy(novo->nome, nome);
-
     novo->esquerda = NULL;
     novo->direita = NULL;
 
@@ -174,4 +180,21 @@ struct No* explorarSalas(No* raiz, char opcao)
 
 
     return raiz;
+}
+
+//////////////////////////// FUNÇÕES DA ÁRVORE DAS PISTAS ///////////////////////////////////
+struct Pista* criarPistas(struct Pista* raizP)
+{
+    struct Pista* novaP = (struct Pista*) malloc(sizeof(struct Pista*));
+
+    if (novaP == NULL)
+    {
+        printf("Erro ao alocar memória...");
+        sleep(1);
+        return 0;
+    }
+
+    strcpy(novaP->nomeP, raizP);
+    novaP->esquerda = NULL;
+    novaP->direita = NULL;
 }
