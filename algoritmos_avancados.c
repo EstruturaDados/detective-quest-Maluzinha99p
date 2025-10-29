@@ -14,7 +14,7 @@ typedef struct No{
     struct No* direita;
 }No;
 
-void menuPrincipal(No* raiz);
+struct No* menuPrincipal(No* raiz);
 struct No* criarSala(const char* nome);
 struct No* conectarSala(struct No* raiz, const char *nome);
 struct No* explorarSalas(No* raiz, char opcao);
@@ -48,7 +48,7 @@ int main() {
     No* atual = nome;
 
     do{
-        menuPrincipal();
+        menuPrincipal(atual);
         scanf(" %c", &opcao[0]);
 
         switch(opcao[0])
@@ -66,6 +66,7 @@ int main() {
                 printf("Opção inválida, por favor escolha a correta!\n\n");
             break;
         }
+        printf("Indo para: %s\n\n", atual->nome);
         sleep(1);
     }while(opcao[0] != 's');
     
@@ -97,7 +98,7 @@ int main() {
     return 0;
 }
 
-void menuPrincipal(No* raiz)
+struct No* menuPrincipal(No* raiz)
 {
     printf("==================================\n");
     printf(" Escolha a opção que você deseja\n");
@@ -106,7 +107,7 @@ void menuPrincipal(No* raiz)
     printf("D - direita\n");
     printf("S - sair do sistema\n");
     printf("-----------------------------------\n");
-    printf("Ambiente atual: %s\n", raiz->nome);
+    printf("Comodo atual: %s\n", raiz->nome);
     printf("-----------------------------------\n");
     printf("Opção: ");
 }
@@ -158,8 +159,6 @@ struct No* explorarSalas(No* raiz, char opcao)
         return NULL;
     }
 
-    printf("Comodo atual: %s\n", raiz->nome);
-
     if(opcao == 'e')
     {
         return raiz->esquerda;
@@ -171,6 +170,8 @@ struct No* explorarSalas(No* raiz, char opcao)
     else{
         printf("Não há salas nesse sentido!\n");
     }
+
+
 
     return raiz;
 }
