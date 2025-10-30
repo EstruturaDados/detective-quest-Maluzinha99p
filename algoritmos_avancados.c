@@ -10,6 +10,7 @@
 
 typedef struct No{
     char nome[MAX_S];
+    char pistas[MAX_S];
     struct No* esquerda;
     struct No* direita;
 }No;
@@ -21,12 +22,12 @@ typedef struct Pista{
 }Pista;
 
 struct No* menuPrincipal(No* raiz);
-struct No* criarSala(const char* nome);
-struct No* conectarSala(struct No* raiz, const char *nome);
+struct No* criarSala(const char* nome, const char* pista);
+struct No* conectarSala(struct No* raiz, const char *nome, const char* pista);
 struct No* explorarSalas(No* raiz, char opcao);
 
 //FUNÇÕES DAS PISTAS
-struct Pista* criarPistas(struct Pista* raizP);
+struct Pista* criarPistas(const char* pista);
 struct Pista* conecatarPistas(struct Pista* raizP, const char* pista);
 void emOrdem(struct Pista* raizP);
 
@@ -77,24 +78,14 @@ int main() {
     int opcao;
 
     //criando comodos
-    nome = conectarSala(nome, "Hall de Entrada");
-    nome = conectarSala(nome, "Cozinha");
-    nome = conectarSala(nome, "Sala de estar");
-    nome = conectarSala(nome, "Varanda");
-    nome = conectarSala(nome, "Quarto");
-    nome = conectarSala(nome, "Banheiro");
-    nome = conectarSala(nome, "Quarto");
-    nome = conectarSala(nome, "Biblioteca");
+    nome = conectarSala(nome, "Hall de Entrada", "Pegadas de lama");
+    nome = conectarSala(nome, "Cozinha", "Pedaços de caco de vidro");
+    nome = conectarSala(nome, "Sala de estar", "Chave perdida");
+    nome = conectarSala(nome, "Varanda", "Vasos quebrados");
+    nome = conectarSala(nome, "Quarto", "Lençol machado");
+    nome = conectarSala(nome, "Banheiro", "Arma jogada no chão");
+    nome = conectarSala(nome, "Biblioteca", "Livros com páginas faltando");
 
-    //criando pistas
-    nomeP = conecatarPistas(nomeP, "Pegadas de lama");
-    nomeP = conecatarPistas(nomeP, "Chave perdida");
-    nomeP = conecatarPistas(nomeP, "Livro com página faltando");
-    nomeP = conecatarPistas(nomeP, "Lençol manchado");
-    nomeP = conecatarPistas(nomeP, "Gaveta perdida");
-    nomeP = conecatarPistas(nomeP, "Arma jogada no chão");
-    nomeP = conecatarPistas(nomeP, "Vasos quebrados");
-    nomeP = conecatarPistas(nomeP, "Pedaços de caco de vidro");
 
     No* atual = nome;
     Pista* atualP = nomeP;
@@ -107,14 +98,21 @@ int main() {
         {
             case 1:
                 atual = explorarSalas(atual, opcao);
+                printf("Indo para: %s\n\n", atual->nome);
             break;
 
             case 2:
                 atual = explorarSalas(atual, opcao);
+                printf("Indo para: %s\n\n", atual->nome);
             break;
 
             case 3:
+                printf("\n------------------\n");
+                printf("LISTANDO AS PISTAS");
+                printf("\n------------------\n");
+                sleep(1);
                 emOrdem(atualP);
+                printf("------------------\n");
             break;
 
             case 0:
@@ -124,7 +122,7 @@ int main() {
                 printf("Opção inválida, por favor escolha a correta!\n\n");
             break;
         }
-        printf("Indo para: %s\n\n", atual->nome);
+
         sleep(1);
     }while(opcao != 0);
 
@@ -148,7 +146,7 @@ struct No* menuPrincipal(No* raiz)
 
 ////////////////////////////// FUNÇÕES DA ÁRVORE DOS COMODOS //////////////////////////////////
 //FUNÇÃO DE CRIAR NÓ
-struct No* criarSala(const char* nome)
+struct No* criarSala(const char* nome, const char* pista)
 {
     struct No* novo = (struct No*) malloc(sizeof(struct No));
 
@@ -160,6 +158,7 @@ struct No* criarSala(const char* nome)
     }
 
     strcpy(novo->nome, nome);
+    strcpy(novo->pista, pista);
     novo->esquerda = NULL;
     novo->direita = NULL;
 
@@ -167,19 +166,19 @@ struct No* criarSala(const char* nome)
 }
 
 //função para adicionar
-struct No* conectarSala(struct No* raiz, const char *nome)
+struct No* conectarSala(struct No* raiz, const char *nome, const char* pista)
 {
     if(raiz == NULL)
     {
-        return criarSala(nome);
+        return criarSala(nome, pista);
     }
     
     if(strcmp(nome, raiz->nome) < 0)
     {
-        raiz->esquerda = conectarSala(raiz->esquerda, nome);
+        raiz->esquerda = conectarSala(raiz->esquerda, nome, pista);
     }
     else{
-        raiz->direita = conectarSala(raiz->direita, nome);
+        raiz->direita = conectarSala(raiz->direita, nome, pista);
     }
 
     return raiz;
@@ -212,29 +211,33 @@ struct No* explorarSalas(No* raiz, char opcao)
 
 //////////////////////////// FUNÇÕES DA ÁRVORE DAS PISTAS ///////////////////////////////////
 //CRIANDO AS PISTAS
-struct Pista* criarPistas(struct Pista* raizP)
+struct Pista* criarPistas(const char* pista)
 {
-    struct Pista* novaP = (struct Pista*) malloc(sizeof(struct Pista*));
+    struct Pista* novaP = (struct Pista*) malloc(sizeof(struct Pista));
 
     if (novaP == NULL)
     {
         printf("Erro ao alocar memória...");
         sleep(1);
-        return 0;
+        return NULL;
     }
 
-    strcpy(novaP->nomeP, raizP);
+    strcpy(novaP->nomeP, pista);
     novaP->esquerda = NULL;
     novaP->direita = NULL;
+
+    return novaP;
 }
+
 
 //CONECTANDO AS PISTAS
 struct Pista* conecatarPistas(struct Pista* raizP, const char* pista)
 {
-    if(raizP == NULL)
+    if (raizP == NULL)
     {
-        criarPistas(raizP);
+        return criarPistas(pista);
     }
+
 
     if(strcmp(pista, raizP->nomeP) < 0)
     {
