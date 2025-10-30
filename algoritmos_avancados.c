@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <locale.h>
 // Desafio Detective Quest
 // Tema 4 - Árvores e Tabela Hash
@@ -23,7 +24,7 @@ typedef struct Pista{
 
 struct No* menuPrincipal(No* raiz);
 struct No* criarSala(const char* nome, const char* pista);
-struct No* conectarSala(struct No* raiz, const char *nome, const char* pista);
+struct No* conectarSala(struct No* raiz, const char *nome, const char* pista, struct Pista** arvorePistas);
 struct No* explorarSalas(No* raiz, char opcao);
 
 //FUNÇÕES DAS PISTAS
@@ -70,21 +71,21 @@ int main() {
     // - Em caso de colisão, use lista encadeada para tratar.
     // - Modularize com funções como inicializarHash(), buscarSuspeito(), listarAssociacoes().
 
-
-        No* nome = NULL;
-        Pista* nomeP = NULL;
+    setlocale(LC_ALL, "");
+    No* nome = NULL;
+    Pista* nomeP = NULL;
 
 
     int opcao;
 
-    //criando comodos
-    nome = conectarSala(nome, "Hall de Entrada", "Pegadas de lama");
-    nome = conectarSala(nome, "Cozinha", "Pedaços de caco de vidro");
-    nome = conectarSala(nome, "Sala de estar", "Chave perdida");
-    nome = conectarSala(nome, "Varanda", "Vasos quebrados");
-    nome = conectarSala(nome, "Quarto", "Lençol machado");
-    nome = conectarSala(nome, "Banheiro", "Arma jogada no chão");
-    nome = conectarSala(nome, "Biblioteca", "Livros com páginas faltando");
+    nome = conectarSala(nome, "Hall de Entrada", "Pegadas de lama", &nomeP);
+    nome = conectarSala(nome, "Cozinha", "Pedaços de caco de vidro", &nomeP);
+    nome = conectarSala(nome, "Sala de estar", "Chave perdida", &nomeP);
+    nome = conectarSala(nome, "Varanda", "Vasos quebrados", &nomeP);
+    nome = conectarSala(nome, "Quarto", "Lençol machado", &nomeP);
+    nome = conectarSala(nome, "Banheiro", "Arma jogada no chão", &nomeP);
+    nome = conectarSala(nome, "Biblioteca", "Livros com páginas faltando", &nomeP);
+
 
 
     No* atual = nome;
@@ -139,7 +140,7 @@ struct No* menuPrincipal(No* raiz)
     printf("3 - Listar Pistas\n");
     printf("0 - sair do sistema\n");
     printf("-----------------------------------\n");
-    printf("Comodo atual: %s\n", raiz->nome);
+    printf("Comodo atual: %s\nPista encontrada: %s\n", raiz->nome, raiz->pistas);
     printf("-----------------------------------\n");
     printf("Opção: ");
 }
@@ -158,7 +159,7 @@ struct No* criarSala(const char* nome, const char* pista)
     }
 
     strcpy(novo->nome, nome);
-    strcpy(novo->pista, pista);
+    strcpy(novo->pistas, pista);
     novo->esquerda = NULL;
     novo->direita = NULL;
 
@@ -166,22 +167,27 @@ struct No* criarSala(const char* nome, const char* pista)
 }
 
 //função para adicionar
-struct No* conectarSala(struct No* raiz, const char *nome, const char* pista)
+struct No* conectarSala(struct No* raiz, const char *nome, const char* pista, struct Pista** arvorePistas)
 {
-    if(raiz == NULL)
+    if (raiz == NULL)
     {
+        *arvorePistas = conecatarPistas(*arvorePistas, pista);
         return criarSala(nome, pista);
     }
-    
-    if(strcmp(nome, raiz->nome) < 0)
+
+    if (strcmp(nome, raiz->nome) < 0)
     {
-        raiz->esquerda = conectarSala(raiz->esquerda, nome, pista);
+        raiz->esquerda = conectarSala(raiz->esquerda, nome, pista, arvorePistas);
     }
-    else{
-        raiz->direita = conectarSala(raiz->direita, nome, pista);
+    else
+    {
+        raiz->direita = conectarSala(raiz->direita, nome, pista, arvorePistas);
     }
 
+    *arvorePistas = conecatarPistas(*arvorePistas, pista);
+
     return raiz;
+
 }
 
 struct No* explorarSalas(No* raiz, char opcao)
@@ -232,13 +238,11 @@ struct Pista* criarPistas(const char* pista)
 
 //CONECTANDO AS PISTAS
 struct Pista* conecatarPistas(struct Pista* raizP, const char* pista)
-{
+{  
     if (raizP == NULL)
     {
         return criarPistas(pista);
     }
-
-
     if(strcmp(pista, raizP->nomeP) < 0)
     {
         raizP->esquerda = conecatarPistas(raizP->esquerda, pista);
@@ -246,7 +250,6 @@ struct Pista* conecatarPistas(struct Pista* raizP, const char* pista)
     else{
         raizP->direita = conecatarPistas(raizP->direita, pista);
     }
-
     return raizP;
 }
 
