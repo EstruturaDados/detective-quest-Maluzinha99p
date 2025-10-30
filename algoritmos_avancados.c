@@ -24,12 +24,12 @@ typedef struct Pista{
 
 struct No* menuPrincipal(No* raiz);
 struct No* criarSala(const char* nome, const char* pista);
-struct No* conectarSala(struct No* raiz, const char *nome, const char* pista, struct Pista** arvorePistas);
-struct No* explorarSalas(No* raiz, char opcao);
+struct No* conectarSala(struct No* raiz, const char *nome, const char* pista);
+struct No* explorarSalas(No* raiz, int opcao, struct Pista** arvorePistas);
 
 //FUNÇÕES DAS PISTAS
 struct Pista* criarPistas(const char* pista);
-struct Pista* conecatarPistas(struct Pista* raizP, const char* pista);
+struct Pista* conectarPistas(struct Pista* raizP, const char* pista);
 void emOrdem(struct Pista* raizP);
 
 
@@ -78,13 +78,13 @@ int main() {
 
     int opcao;
 
-    nome = conectarSala(nome, "Hall de Entrada", "Pegadas de lama", &nomeP);
-    nome = conectarSala(nome, "Cozinha", "Pedaços de caco de vidro", &nomeP);
-    nome = conectarSala(nome, "Sala de estar", "Chave perdida", &nomeP);
-    nome = conectarSala(nome, "Varanda", "Vasos quebrados", &nomeP);
-    nome = conectarSala(nome, "Quarto", "Lençol machado", &nomeP);
-    nome = conectarSala(nome, "Banheiro", "Arma jogada no chão", &nomeP);
-    nome = conectarSala(nome, "Biblioteca", "Livros com páginas faltando", &nomeP);
+    nome = conectarSala(nome, "Hall de Entrada", "Pegadas de lama");
+    nome = conectarSala(nome, "Cozinha", "Pedaços de caco de vidro");
+    nome = conectarSala(nome, "Sala de estar", "Chave perdida");
+    nome = conectarSala(nome, "Varanda", "Vasos quebrados");
+    nome = conectarSala(nome, "Quarto", "Lençol machado");
+    nome = conectarSala(nome, "Banheiro", "Arma jogada no chão");
+    nome = conectarSala(nome, "Biblioteca", "Livros com páginas faltando");
 
 
 
@@ -98,12 +98,12 @@ int main() {
         switch(opcao)
         {
             case 1:
-                atual = explorarSalas(atual, opcao);
+                atual = explorarSalas(atual, opcao, &nomeP);
                 printf("Indo para: %s\n\n", atual->nome);
             break;
 
             case 2:
-                atual = explorarSalas(atual, opcao);
+                atual = explorarSalas(atual, opcao, &nomeP);
                 printf("Indo para: %s\n\n", atual->nome);
             break;
 
@@ -112,7 +112,7 @@ int main() {
                 printf("LISTANDO AS PISTAS");
                 printf("\n------------------\n");
                 sleep(1);
-                emOrdem(atualP);
+                emOrdem(nomeP);
                 printf("------------------\n");
             break;
 
@@ -167,53 +167,62 @@ struct No* criarSala(const char* nome, const char* pista)
 }
 
 //função para adicionar
-struct No* conectarSala(struct No* raiz, const char *nome, const char* pista, struct Pista** arvorePistas)
+struct No* conectarSala(struct No* raiz, const char *nome, const char* pista)
 {
     if (raiz == NULL)
     {
-        *arvorePistas = conecatarPistas(*arvorePistas, pista);
         return criarSala(nome, pista);
     }
 
     if (strcmp(nome, raiz->nome) < 0)
     {
-        raiz->esquerda = conectarSala(raiz->esquerda, nome, pista, arvorePistas);
+        raiz->esquerda = conectarSala(raiz->esquerda, nome, pista);
     }
     else
     {
-        raiz->direita = conectarSala(raiz->direita, nome, pista, arvorePistas);
+        raiz->direita = conectarSala(raiz->direita, nome, pista);
     }
 
-    *arvorePistas = conecatarPistas(*arvorePistas, pista);
-
     return raiz;
-
 }
 
-struct No* explorarSalas(No* raiz, char opcao)
+struct No* explorarSalas(No* raiz, int opcao, struct Pista** arvorePistas)
 {
-    if(raiz == NULL)
+    if (raiz == NULL)
     {
-        printf("Comodo sem saída!\n");
+        printf("Cômodo sem saída!\n");
         return NULL;
     }
 
-    if(opcao == 1)
+    No* proximo = NULL;
+
+    if (opcao == 1)
     {
-        return raiz->esquerda;
+        proximo = raiz->esquerda;
     }
-    else if(opcao == 2)
+    else if (opcao == 2)
     {
-        return raiz->direita;
+        proximo = raiz->direita;
     }
-    else{
+    else
+    {
         printf("Não há salas nesse sentido!\n");
+        return raiz;
     }
 
+    if (proximo != NULL)
+    {
+        // Agora sim: adiciona a pista da sala para onde foi
+        *arvorePistas = conectarPistas(*arvorePistas, proximo->pistas);
+    }
+    else
+    {
+        printf("Não há sala nesse lado!\n");
+    }
 
-
-    return raiz;
+    return proximo;
 }
+
 
 //////////////////////////// FUNÇÕES DA ÁRVORE DAS PISTAS ///////////////////////////////////
 //CRIANDO AS PISTAS
@@ -237,7 +246,7 @@ struct Pista* criarPistas(const char* pista)
 
 
 //CONECTANDO AS PISTAS
-struct Pista* conecatarPistas(struct Pista* raizP, const char* pista)
+struct Pista* conectarPistas(struct Pista* raizP, const char* pista)
 {  
     if (raizP == NULL)
     {
@@ -245,10 +254,10 @@ struct Pista* conecatarPistas(struct Pista* raizP, const char* pista)
     }
     if(strcmp(pista, raizP->nomeP) < 0)
     {
-        raizP->esquerda = conecatarPistas(raizP->esquerda, pista);
+        raizP->esquerda = conectarPistas(raizP->esquerda, pista);
     }
     else{
-        raizP->direita = conecatarPistas(raizP->direita, pista);
+        raizP->direita = conectarPistas(raizP->direita, pista);
     }
     return raizP;
 }
