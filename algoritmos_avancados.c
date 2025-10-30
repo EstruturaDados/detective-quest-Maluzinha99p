@@ -25,6 +25,13 @@ struct No* criarSala(const char* nome);
 struct No* conectarSala(struct No* raiz, const char *nome);
 struct No* explorarSalas(No* raiz, char opcao);
 
+//FUNÇÕES DAS PISTAS
+struct Pista* criarPistas(struct Pista* raizP);
+struct Pista* conecatarPistas(struct Pista* raizP, const char* pista);
+void emOrdem(struct Pista* raizP);
+
+
+
 int main() {
 
     // 🌱 Nível Novato: Mapa da Mansão com Árvore Binária
@@ -37,45 +44,6 @@ int main() {
     // - Exiba o nome da sala a cada movimento.
     // - Use recursão ou laços para caminhar pela árvore.
     // - Nenhuma inserção dinâmica é necessária neste nível.
-    No* nome = NULL;
-
-
-    char opcao[2];
-
-    nome = conectarSala(nome, "Hall de Entrada");
-    nome = conectarSala(nome, "Cozinha");
-    nome = conectarSala(nome, "Sala de estar");
-    nome = conectarSala(nome, "Varanda");
-    nome = conectarSala(nome, "Quarto");
-    nome = conectarSala(nome, "Banheiro");
-    nome = conectarSala(nome, "Quarto");
-    nome = conectarSala(nome, "Biblioteca");
-
-    No* atual = nome;
-
-    do{
-        menuPrincipal(atual);
-        scanf(" %c", &opcao[0]);
-
-        switch(opcao[0])
-        {
-            case 'e':
-                atual = explorarSalas(atual, opcao[0]);
-            break;
-            case 'd':
-                atual = explorarSalas(atual, opcao[0]);
-            break;
-            case 's':
-                printf("Saindo do sistema...");
-            break;
-            default:
-                printf("Opção inválida, por favor escolha a correta!\n\n");
-            break;
-        }
-        printf("Indo para: %s\n\n", atual->nome);
-        sleep(1);
-    }while(opcao[0] != 's');
-    
 
     // 🔍 Nível Aventureiro: Armazenamento de Pistas com Árvore de Busca
     //
@@ -101,6 +69,65 @@ int main() {
     // - Em caso de colisão, use lista encadeada para tratar.
     // - Modularize com funções como inicializarHash(), buscarSuspeito(), listarAssociacoes().
 
+
+        No* nome = NULL;
+        Pista* nomeP = NULL;
+
+
+    int opcao;
+
+    //criando comodos
+    nome = conectarSala(nome, "Hall de Entrada");
+    nome = conectarSala(nome, "Cozinha");
+    nome = conectarSala(nome, "Sala de estar");
+    nome = conectarSala(nome, "Varanda");
+    nome = conectarSala(nome, "Quarto");
+    nome = conectarSala(nome, "Banheiro");
+    nome = conectarSala(nome, "Quarto");
+    nome = conectarSala(nome, "Biblioteca");
+
+    //criando pistas
+    nomeP = conecatarPistas(nomeP, "Pegadas de lama");
+    nomeP = conecatarPistas(nomeP, "Chave perdida");
+    nomeP = conecatarPistas(nomeP, "Livro com página faltando");
+    nomeP = conecatarPistas(nomeP, "Lençol manchado");
+    nomeP = conecatarPistas(nomeP, "Gaveta perdida");
+    nomeP = conecatarPistas(nomeP, "Arma jogada no chão");
+    nomeP = conecatarPistas(nomeP, "Vasos quebrados");
+    nomeP = conecatarPistas(nomeP, "Pedaços de caco de vidro");
+
+    No* atual = nome;
+    Pista* atualP = nomeP;
+
+    do{
+        menuPrincipal(atual);
+        scanf(" %d", &opcao);
+
+        switch(opcao)
+        {
+            case 1:
+                atual = explorarSalas(atual, opcao);
+            break;
+
+            case 2:
+                atual = explorarSalas(atual, opcao);
+            break;
+
+            case 3:
+                emOrdem(atualP);
+            break;
+
+            case 0:
+                printf("Saindo do sistema...");
+            break;
+            default:
+                printf("Opção inválida, por favor escolha a correta!\n\n");
+            break;
+        }
+        printf("Indo para: %s\n\n", atual->nome);
+        sleep(1);
+    }while(opcao != 0);
+
     return 0;
 }
 
@@ -109,9 +136,10 @@ struct No* menuPrincipal(No* raiz)
     printf("==================================\n");
     printf(" Escolha a opção que você deseja\n");
     printf("==================================\n");
-    printf("E - esquerda\n");
-    printf("D - direita\n");
-    printf("S - sair do sistema\n");
+    printf("1 - Ir para esquerda\n");
+    printf("2 - Ir para direita\n");
+    printf("3 - Listar Pistas\n");
+    printf("0 - sair do sistema\n");
     printf("-----------------------------------\n");
     printf("Comodo atual: %s\n", raiz->nome);
     printf("-----------------------------------\n");
@@ -165,11 +193,11 @@ struct No* explorarSalas(No* raiz, char opcao)
         return NULL;
     }
 
-    if(opcao == 'e')
+    if(opcao == 1)
     {
         return raiz->esquerda;
     }
-    else if(opcao == 'd')
+    else if(opcao == 2)
     {
         return raiz->direita;
     }
@@ -183,6 +211,7 @@ struct No* explorarSalas(No* raiz, char opcao)
 }
 
 //////////////////////////// FUNÇÕES DA ÁRVORE DAS PISTAS ///////////////////////////////////
+//CRIANDO AS PISTAS
 struct Pista* criarPistas(struct Pista* raizP)
 {
     struct Pista* novaP = (struct Pista*) malloc(sizeof(struct Pista*));
@@ -197,4 +226,34 @@ struct Pista* criarPistas(struct Pista* raizP)
     strcpy(novaP->nomeP, raizP);
     novaP->esquerda = NULL;
     novaP->direita = NULL;
+}
+
+//CONECTANDO AS PISTAS
+struct Pista* conecatarPistas(struct Pista* raizP, const char* pista)
+{
+    if(raizP == NULL)
+    {
+        criarPistas(raizP);
+    }
+
+    if(strcmp(pista, raizP->nomeP) < 0)
+    {
+        raizP->esquerda = conecatarPistas(raizP->esquerda, pista);
+    }
+    else{
+        raizP->direita = conecatarPistas(raizP->direita, pista);
+    }
+
+    return raizP;
+}
+
+//ORDENANDO AS PITAS EM ORDEM ALFABÉTICA
+void emOrdem(struct Pista* raizP)
+{
+    if(raizP != NULL)
+    {
+        emOrdem(raizP->esquerda);
+        printf("%s\n", raizP->nomeP);
+        emOrdem(raizP->direita);
+    }
 }
