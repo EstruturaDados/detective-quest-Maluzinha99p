@@ -26,11 +26,13 @@ struct No* menuPrincipal(No* raiz);
 struct No* criarSala(const char* nome, const char* pista);
 struct No* conectarSala(struct No* raiz, const char *nome, const char* pista);
 struct No* explorarSalas(No* raiz, int opcao, struct Pista** arvorePistas);
+void liberar(struct No* raiz);
 
 //FUNÇÕES DAS PISTAS
 struct Pista* criarPistas(const char* pista);
 struct Pista* conectarPistas(struct Pista* raizP, const char* pista);
 void emOrdem(struct Pista* raizP);
+void liberarEspaco(struct Pista* pistas);
 
 
 
@@ -127,6 +129,8 @@ int main() {
         sleep(1);
     }while(opcao != 0);
 
+    liberar(&nome);
+    liberarEspaco(&nomeP);
     return 0;
 }
 
@@ -188,6 +192,10 @@ struct No* conectarSala(struct No* raiz, const char *nome, const char* pista)
 
 struct No* explorarSalas(No* raiz, int opcao, struct Pista** arvorePistas)
 {
+    if(strcmp(raiz->nome, "Hall de Entrada") == 0)
+    {
+        *arvorePistas = conectarPistas(*arvorePistas, raiz->pistas);
+    }
     if (raiz == NULL)
     {
         printf("Cômodo sem saída!\n");
@@ -223,6 +231,17 @@ struct No* explorarSalas(No* raiz, int opcao, struct Pista** arvorePistas)
     return proximo;
 }
 
+void liberar(struct No* raiz)
+{
+    if(raiz != NULL)
+    {
+        liberar(raiz->esquerda);
+
+        liberar(raiz->direita);
+
+        free(raiz);
+    }
+}
 
 //////////////////////////// FUNÇÕES DA ÁRVORE DAS PISTAS ///////////////////////////////////
 //CRIANDO AS PISTAS
@@ -270,5 +289,17 @@ void emOrdem(struct Pista* raizP)
         emOrdem(raizP->esquerda);
         printf("%s\n", raizP->nomeP);
         emOrdem(raizP->direita);
+    }
+}
+
+void liberarEspaco(struct Pista* pistas)
+{
+    if(pistas != NULL)
+    {
+        liberarEspaco(pistas->esquerda);
+
+        liberarEspaco(pistas->direita);
+
+        free(pistas);
     }
 }
